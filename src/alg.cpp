@@ -2,9 +2,9 @@
 #include "tree.h"
 
 #include <memory>
-#include <vector>
 #include <algorithm>
 #include <stdexcept>
+#include <vector>
 
 Node::Node(char value) : val(value) {}
 
@@ -80,7 +80,8 @@ std::vector<char> getPerm2(PMTree& tree, int num) {
   for (int i = 1; i < 13; ++i)
     factorials[i] = factorials[i - 1] * i;
 
-  if (num <= 0 || num > factorials[n]) return {};
+  if (num <= 0 || num > factorials[n])
+    return {};
 
   while (!current->children.empty()) {
     int f = factorials[n - 1];
@@ -100,9 +101,6 @@ std::vector<char> getPerm2(PMTree& tree, int num) {
     result.push_back(current->val);
     --n;
   }
-
-  return result;
-}
 
   return result;
 }
