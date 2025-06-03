@@ -1,8 +1,8 @@
 // Copyright 2022 NNTU-CS
 #include "tree.h"
 
-#include <vector>
 #include <memory>
+#include <vector>
 #include <algorithm>
 #include <stdexcept>
 
@@ -59,10 +59,6 @@ std::shared_ptr<Node> PMTree::getRoot() {
   return root;
 }
 
-// -----------------------------
-// Глобальные функции:
-// -----------------------------
-
 std::vector<std::vector<char>> getAllPerms(PMTree& tree) {
   return tree.getAllPerms();
 }
@@ -78,17 +74,21 @@ std::vector<char> getPerm2(PMTree& tree, int num) {
   std::shared_ptr<Node> current = tree.getRoot();
   int index = num - 1;
 
-  std::vector<int> factorials(10, 1);
-  for (int i = 1; i < 10; ++i) {
-    factorials[i] = factorials[i - 1] * i;
-  }
-
   int n = static_cast<int>(current->children.size());
+
+  std::vector<int> factorials(13, 1);
+  for (int i = 1; i < 13; ++i)
+    factorials[i] = factorials[i - 1] * i;
+
+  if (num <= 0 || num > factorials[n]) return {};
 
   while (!current->children.empty()) {
     int f = factorials[n - 1];
     int pos = index / f;
     index %= f;
+
+    if (pos >= static_cast<int>(current->children.size()))
+      return {};
 
     std::sort(current->children.begin(), current->children.end(),
               [](const std::shared_ptr<Node>& a,
@@ -100,6 +100,9 @@ std::vector<char> getPerm2(PMTree& tree, int num) {
     result.push_back(current->val);
     --n;
   }
+
+  return result;
+}
 
   return result;
 }
