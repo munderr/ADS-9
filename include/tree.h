@@ -8,8 +8,7 @@
 struct Node {
   char val;
   std::vector<std::shared_ptr<Node>> children;
-
-  explicit Node(char value) : val(value) {}
+  explicit Node(char value);
 };
 
 class PMTree {
