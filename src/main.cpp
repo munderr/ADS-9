@@ -1,55 +1,79 @@
 // Copyright 2022 NNTU-CS
-#include <iostream>
-#include <fstream>
 #include <chrono>
+#include <cstdlib>
+#include <ctime>
+#include <iostream>
 #include <vector>
-#include <random>
+
 #include "tree.h"
 
-std::vector<char> generateAlphabet(int n) {
-  std::vector<char> v;
-  for (int i = 0; i < n; ++i)
-    v.push_back('A' + i);
-  return v;
+void printVector(const std::vector<char>& vec) {
+  for (char c : vec) std::cout << c;
+  std::cout << "\n";
 }
 
-int getRandomIndex(int max) {
-  static std::mt19937 rng(std::random_device{}());
-  std::uniform_int_distribution<int> dist(1, max);
-  return dist(rng);
+int factorial(int n) {
+  int res = 1;
+  for (int i = 2; i <= n; ++i) res *= i;
+  return res;
 }
 
 int main() {
-  std::ofstream out("result/data.csv");
-  out << "n,allPerms_ms,perm1_ms,perm2_ms\n";
+  std::srand(static_cast<unsigned>(std::time(0)));
+
+  std::vector<char> base = {'1', '2', '3'};
+  PMTree tree(base);
+
+  std::cout << "All permutations for {1,2,3}:\n";
+  auto all = getAllPerms(tree);
+  for (const auto& p : all) printVector(p);
+
+  std::cout << "\ngetPerm1 (num 4): ";
+  printVector(getPerm1(tree, 4));
+
+  std::cout << "getPerm2 (num 4): ";
+  printVector(getPerm2(tree, 4));
+
+  std::cout << "\nBenchmarking performance from n = 3 to 8\n";
 
   for (int n = 3; n <= 8; ++n) {
-    std::vector<char> input = generateAlphabet(n);
-    PMTree tree(input);
+    std::vector<char> input;
+    for (int i = 0; i < n; ++i)
+      input.push_back('a' + i);
 
-    auto start = std::chrono::high_resolution_clock::now();
-    auto all = getAllPerms(tree);
-    auto end = std::chrono::high_resolution_clock::now();
-    auto timeAll = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+    PMTree t(input);
+    int total = factorial(n);
+    int num = std::rand() % total + 1;
 
-    int maxIndex = 1;
-    for (int i = 2; i <= n; ++i) maxIndex *= i;
-    int randIndex = getRandomIndex(maxIndex);
+    auto t1_start = std::chrono::high_resolution_clock::now();
+    getAllPerms(t);
+    auto t1_end = std::chrono::high_resolution_clock::now();
+    double time1 = std::chrono::duration_cast<std::chrono::microseconds>(
+                     t1_end - t1_start)
+                     .count() /
+                   1000.0;
 
-    start = std::chrono::high_resolution_clock::now();
-    auto p1 = getPerm1(tree, randIndex);
-    end = std::chrono::high_resolution_clock::now();
-    auto timeP1 = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+    auto t2_start = std::chrono::high_resolution_clock::now();
+    getPerm1(t, num);
+    auto t2_end = std::chrono::high_resolution_clock::now();
+    double time2 = std::chrono::duration_cast<std::chrono::microseconds>(
+                     t2_end - t2_start)
+                     .count() /
+                   1000.0;
 
-    start = std::chrono::high_resolution_clock::now();
-    auto p2 = getPerm2(tree, randIndex);
-    end = std::chrono::high_resolution_clock::now();
-    auto timeP2 = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+    auto t3_start = std::chrono::high_resolution_clock::now();
+    getPerm2(t, num);
+    auto t3_end = std::chrono::high_resolution_clock::now();
+    double time3 = std::chrono::duration_cast<std::chrono::microseconds>(
+                     t3_end - t3_start)
+                     .count() /
+                   1000.0;
 
-    out << n << "," << timeAll << "," << timeP1 << "," << timeP2 << "\n";
-    std::cout << "n=" << n << " done\n";
+    std::cout << "n = " << n
+              << " | getAllPerms = " << time1 << " ms"
+              << " | getPerm1 = " << time2 << " ms"
+              << " | getPerm2 = " << time3 << " ms\n";
   }
 
-  out.close();
   return 0;
 }
