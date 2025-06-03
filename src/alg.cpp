@@ -1,10 +1,10 @@
 // Copyright 2022 NNTU-CS
-#include "tree.h"
-
 #include <algorithm>
 #include <memory>
 #include <stdexcept>
 #include <vector>
+
+#include "tree.h"
 
 Node::Node(char value) : val(value) {}
 
