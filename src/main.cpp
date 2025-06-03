@@ -2,19 +2,22 @@
 #include <chrono>
 #include <cstdlib>
 #include <ctime>
+#include <fstream>
 #include <iostream>
 #include <vector>
 
 #include "tree.h"
 
 void printVector(const std::vector<char>& vec) {
-  for (char c : vec) std::cout << c;
+  for (char c : vec)
+    std::cout << c;
   std::cout << "\n";
 }
 
 int factorial(int n) {
   int res = 1;
-  for (int i = 2; i <= n; ++i) res *= i;
+  for (int i = 2; i <= n; ++i)
+    res *= i;
   return res;
 }
 
@@ -26,7 +29,8 @@ int main() {
 
   std::cout << "All permutations for {1,2,3}:\n";
   auto all = getAllPerms(tree);
-  for (const auto& p : all) printVector(p);
+  for (const auto& p : all)
+    printVector(p);
 
   std::cout << "\ngetPerm1 (num 4): ";
   printVector(getPerm1(tree, 4));
@@ -34,7 +38,10 @@ int main() {
   std::cout << "getPerm2 (num 4): ";
   printVector(getPerm2(tree, 4));
 
-  std::cout << "\nBenchmarking performance from n = 3 to 8\n";
+  std::ofstream file("result/data.csv");
+  file << "n,getAllPerms,getPerm1,getPerm2\n";
+
+  std::cout << "\nBenchmark (n = 3 to 8):\n";
 
   for (int n = 3; n <= 8; ++n) {
     std::vector<char> input;
@@ -73,7 +80,10 @@ int main() {
               << " | getAllPerms = " << time1 << " ms"
               << " | getPerm1 = " << time2 << " ms"
               << " | getPerm2 = " << time3 << " ms\n";
+
+    file << n << "," << time1 << "," << time2 << "," << time3 << "\n";
   }
 
+  file.close();
   return 0;
 }
