@@ -55,15 +55,27 @@ std::vector<std::vector<char>> PMTree::getAllPerms() {
   return permutations;
 }
 
-std::vector<char> PMTree::getPerm1(int num) {
-  auto all = getAllPerms();
+std::shared_ptr<Node> PMTree::getRoot() {
+  return root;
+}
+
+// -----------------------------
+// Глобальные функции:
+// -----------------------------
+
+std::vector<std::vector<char>> getAllPerms(PMTree& tree) {
+  return tree.getAllPerms();
+}
+
+std::vector<char> getPerm1(PMTree& tree, int num) {
+  auto all = tree.getAllPerms();
   if (num <= 0 || num > static_cast<int>(all.size())) return {};
   return all[num - 1];
 }
 
-std::vector<char> PMTree::getPerm2(int num) {
+std::vector<char> getPerm2(PMTree& tree, int num) {
   std::vector<char> result;
-  std::shared_ptr<Node> current = root;
+  std::shared_ptr<Node> current = tree.getRoot();
   int index = num - 1;
 
   std::vector<int> factorials(10, 1);
@@ -71,7 +83,7 @@ std::vector<char> PMTree::getPerm2(int num) {
     factorials[i] = factorials[i - 1] * i;
   }
 
-  int n = static_cast<int>(root->children.size());
+  int n = static_cast<int>(current->children.size());
 
   while (!current->children.empty()) {
     int f = factorials[n - 1];
