@@ -1,10 +1,12 @@
 // Copyright 2022 NNTU-CS
-#include  <iostream>
-#include  <fstream>
-#include  <locale>
-#include  <cstdlib>
-#include  "tree.h"
+#include "tree.h"
+
+#include <vector>
+#include <memory>
 #include <algorithm>
+#include <stdexcept>
+
+Node::Node(char value) : val(value) {}
 
 PMTree::PMTree(const std::vector<char>& items) {
   root = std::make_shared<Node>('*');
@@ -29,7 +31,9 @@ void PMTree::build(std::shared_ptr<Node> node, std::vector<char> remaining) {
 }
 
 void PMTree::traverse(std::shared_ptr<Node> node, std::vector<char>& path) {
-  if (node->val != '*') path.push_back(node->val);
+  if (node->val != '*') {
+    path.push_back(node->val);
+  }
 
   if (node->children.empty()) {
     permutations.push_back(path);
@@ -39,7 +43,9 @@ void PMTree::traverse(std::shared_ptr<Node> node, std::vector<char>& path) {
     }
   }
 
-  if (node->val != '*') path.pop_back();
+  if (node->val != '*') {
+    path.pop_back();
+  }
 }
 
 std::vector<std::vector<char>> PMTree::getAllPerms() {
@@ -51,7 +57,7 @@ std::vector<std::vector<char>> PMTree::getAllPerms() {
 
 std::vector<char> PMTree::getPerm1(int num) {
   auto all = getAllPerms();
-  if (num <= 0 || num > (int)all.size()) return {};
+  if (num <= 0 || num > static_cast<int>(all.size())) return {};
   return all[num - 1];
 }
 
@@ -61,19 +67,22 @@ std::vector<char> PMTree::getPerm2(int num) {
   int index = num - 1;
 
   std::vector<int> factorials(10, 1);
-  for (int i = 1; i < 10; ++i)
+  for (int i = 1; i < 10; ++i) {
     factorials[i] = factorials[i - 1] * i;
+  }
 
-  int n = root->children.size();
-  std::vector<char> used;
+  int n = static_cast<int>(root->children.size());
 
   while (!current->children.empty()) {
     int f = factorials[n - 1];
     int pos = index / f;
     index %= f;
-    std::sort(current->children.begin(), current->children.end(), [](auto a, auto b) {
-      return a->val < b->val;
-    });
+
+    std::sort(current->children.begin(), current->children.end(),
+              [](const std::shared_ptr<Node>& a,
+                 const std::shared_ptr<Node>& b) {
+                return a->val < b->val;
+              });
 
     current = current->children[pos];
     result.push_back(current->val);
